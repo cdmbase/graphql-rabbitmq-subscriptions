@@ -4,7 +4,7 @@ This package implements the PusSubEngine Interface from the graphql-subscription
 It allows you to connect your subscriptions manger to a rabbitmq Pub Sub mechanism to support 
 multiple subscription manager instances.
 
-This package is copied from [graphql-redis-subscriptions]('https://github.com/davidyaha/graphql-redis-subscriptions') and modified to work with RabbitMQ.
+This package is copied from [graphql-redis-subscriptions]('https://github.com/davidyaha/graphql-redis-subscriptions') originally and modified to work with RabbitMQ.
    
 ## Basic Usage
 
