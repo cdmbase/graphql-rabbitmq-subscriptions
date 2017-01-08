@@ -3,7 +3,7 @@ import * as chaiAsPromised from 'chai-as-promised';
 import {spy, restore} from 'simple-mock';
 
 import * as redis from 'redis';
-import {RedisPubSub} from '../amqp-pubsub';
+import { AmqpPubSub } from '../amqp-pubsub';
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
@@ -38,7 +38,7 @@ redisPackage['createClient'] = createClient;
 
 describe('RedisPubSub', function () {
 
-  const pubSub = new RedisPubSub();
+  const pubSub = new AmqpPubSub();
 
   it('can subscribe to specific redis channel and called when a message is published on it', function (done) {
 
@@ -199,7 +199,7 @@ describe('RedisPubSub', function () {
 
   it('can use transform function to convert the trigger name given into more explicit channel name', function (done) {
     const triggerTransform = (trigger, {repoName}) => `${trigger}.${repoName}`;
-    const pubsub = new RedisPubSub({
+    const pubsub = new AmqpPubSub({
       triggerTransform,
     });
 

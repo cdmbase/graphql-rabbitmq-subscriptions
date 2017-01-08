@@ -1,17 +1,19 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "es3",
     "module": "commonjs",
+    "experimentalDecorators": true,
+    "declaration": false,
+    "removeComments": true,
+    "noLib": false,
+    "preserveConstEnums": false,
     "moduleResolution": "node",
     "sourceMap": true,
-    "noImplicitAny": false,
     "rootDir": "./src",
     "outDir": "./dist",
     "allowSyntheticDefaultImports": true,
-    "pretty": true,
-    "removeComments": true,
-    "declaration": true,
-    "lib": ["es6"]
+    "pretty": true
+    //"lib": ["es6"]
   },
   "exclude": [
     "node_modules",
