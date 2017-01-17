@@ -1,6 +1,6 @@
 {
   "name": "graphql-rabbitmq-subscriptions",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A graphql-subscriptions PubSub Engine using RabbitMQ",
   "main": "dist/index.js",
   "repository": {
@@ -9,7 +9,7 @@
   },
   "keywords": [
     "graphql",
-    "redis",
+    "rabbitmq",
     "apollo",
     "subscriptions"
   ],
@@ -54,7 +54,6 @@
     "@types/mocha": "^2.2.33",
     "@types/node": "0.0.3",
     "@types/promises-a-plus": "^0.0.27",
-    "@types/redis": "^0.12.34",
     "@types/simple-mock": "0.0.27",
     "@types/sinon": "^1.16.34",
     "@types/when": "^2.4.28",
