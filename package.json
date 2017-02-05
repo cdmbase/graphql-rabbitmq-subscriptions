@@ -31,18 +31,15 @@
     "prepublish": "npm run integration"
   },
   "dependencies": {
+    "@types/bunyan": "^0.0.35",
     "async": "^2.0.1",
-    "bunyan": "^1.8.5",
-    "cdm-logger": "^0.3.2",
     "graphql-subscriptions": "^0.2.3",
-    "pino": "^3.1.0",
     "rabbitmq-pub-sub": "^0.2.1"
   },
   "devDependencies": {
     "@types/amqplib": "^0.5.1",
     "@types/async": "^2.0.38",
     "@types/bluebird": "^3.0.37",
-    "@types/bunyan": "^0.0.35",
     "@types/chai": "^3.4.34",
     "@types/chai-as-promised": "0.0.29",
     "@types/core-js": "^0.9.35",
@@ -62,6 +59,7 @@
     "babel-preset-stage-0": "^6.3.13",
     "bluebird": "^3.4.7",
     "bunyan": "^1.8.5",
+    "cdm-logger": "^0.3.2",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "graphql": "^0.8.0 || ^0.9.0",
