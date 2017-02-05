@@ -5,9 +5,9 @@ import {
   RabbitMqProducer,
   IRabbitMqConnectionConfig,
   IRabbitMqConsumerDisposer,
-} from "rokot-mq-rabbit";
+} from "rabbitmq-pub-sub";
 import {each} from 'async';
-import { Logger } from 'bunyan';
+import * as Logger from 'bunyan';
 import { createChildLogger } from './childLogger';
 
 export interface PubSubRabbitMQBusOptions {
