@@ -22,35 +22,33 @@
   "scripts": {
     "compile": "tsc",
     "pretest": "npm run compile",
-    "test": "npm run testonly -- && npm run integration --",
+    "test": "npm run integration",
     "posttest": "npm run lint",
     "lint": "tslint ./src/**/*.ts",
     "watch": "tsc -w",
-    "testonly": "mocha --reporter spec --full-trace ./dist/test/rabbitmq-tests.js ",
     "integration": "npm run compile && mocha --compilers js:babel-core/register --reporter  spec --full-trace  ./dist/test/integration-tests.js ",
     "custom": "npm run compile && mocha --compilers js:babel-core/register --reporter  spec --full-trace  ./dist/test/custom-tests.js ",
-    "rabbitmq": "npm run compile && mocha --compilers js:babel-core/register --reporter  spec --full-trace  ./dist/test/rabbitmq-tests.js ",
-    "prepublish": "npm run rabbitmq"
+    "prepublish": "npm run integration"
   },
   "dependencies": {
     "async": "^2.0.1",
     "bunyan": "^1.8.5",
     "cdm-logger": "^0.3.2",
-    "graphql-subscriptions": "^0.2.0",
+    "graphql-subscriptions": "^0.2.3",
     "pino": "^3.1.0",
     "rabbitmq-pub-sub": "^0.2.1"
   },
   "devDependencies": {
-    "@types/amqplib": "^0.5.0",
-    "@types/async": "^2.0.35",
+    "@types/amqplib": "^0.5.1",
+    "@types/async": "^2.0.38",
     "@types/bluebird": "^3.0.37",
     "@types/bunyan": "^0.0.35",
     "@types/chai": "^3.4.34",
     "@types/chai-as-promised": "0.0.29",
     "@types/core-js": "^0.9.35",
     "@types/graphql": "^0.8.2",
-    "@types/mocha": "^2.2.33",
-    "@types/node": "0.0.3",
+    "@types/mocha": "^2.2.39",
+    "@types/node": "7.0.5",
     "@types/promises-a-plus": "^0.0.27",
     "@types/simple-mock": "0.0.27",
     "@types/sinon": "^1.16.34",
@@ -66,13 +64,12 @@
     "bunyan": "^1.8.5",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
-    "graphql": "^0.7.0 || ^0.8.0",
+    "graphql": "^0.8.0 || ^0.9.0",
     "istanbul": "1.0.0-alpha.2",
     "mocha": "^3.0.0",
-    "remap-istanbul": "^0.7.0",
-    "rokot-test": "^0.2.5",
+    "remap-istanbul": "^0.8.4",
     "simple-mock": "^0.7.0",
-    "tslint": "^3.13.0",
-    "typescript": "^2.1.4"
+    "tslint": "^4.4.2",
+    "typescript": "^2.1.5"
   }
 }
