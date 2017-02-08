@@ -1,11 +1,9 @@
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
-import * as Promise from "bluebird";
-import { ConsoleLogger } from "cdm-logger";
+import { ConsoleLogger } from 'cdm-logger';
 import {
-  RabbitMqConnectionFactory, RabbitMqConsumer, RabbitMqProducer, IRabbitMqConnectionConfig,
-  RabbitMqSingletonConnectionFactory,
-  DefaultQueueNameConfig
+  IRabbitMqConnectionConfig,
+  RabbitMqConnectionFactory,
 } from 'rabbitmq-pub-sub';
 
 import {
@@ -19,11 +17,18 @@ import {
 import { SubscriptionManager } from 'graphql-subscriptions';
 import { AmqpPubSub } from '../amqp-pubsub';
 
-const logger = ConsoleLogger.create("integration-test", { level: "trace" });
+const logger = ConsoleLogger.create('integration-test', { level: 'trace'});
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 const assert = chai.assert;
+
+// various subscription endpoints
+const TRIGGER1 = 'Trigger1';
+const TRIGGER2 = 'Trigger2';
+const TEST_SUBSCRIPTION = 'testSubscription';
+const NOT_A_TRIGGER = 'NotATrigger';
+const FILTER1 = 'Filter1';
 
 const schema = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -33,9 +38,9 @@ const schema = new GraphQLSchema({
         type: GraphQLString,
         resolve: function (_, args) {
           return 'works';
-        }
-      }
-    }
+        },
+      },
+    },
   }),
   subscription: new GraphQLObjectType({
     name: 'Subscription',
@@ -53,7 +58,7 @@ const schema = new GraphQLSchema({
         },
         args: {
           filterBoolean: { type: GraphQLBoolean },
-        }
+        },
       },
       testFilterMulti: {
         type: GraphQLString,
@@ -73,10 +78,10 @@ const schema = new GraphQLSchema({
         },
         args: {
           repoName: { type: GraphQLString },
-        }
-      }
-    }
-  })
+        },
+      },
+    },
+  }),
 });
 
 describe('SubscriptionManager', function () {
@@ -93,8 +98,8 @@ describe('SubscriptionManager', function () {
         return {
           'Trigger1': { filter: () => true },
           'Trigger2': { filter: () => true },
-        }
-      }
+        };
+      },
     },
     pubsub: new AmqpPubSub({ logger }),
   });
@@ -115,21 +120,22 @@ describe('SubscriptionManager', function () {
 
   it('can subscribe with a valid query and get the root value', function (done) {
     const query = 'subscription X{ testSubscription }';
+    let subscriberId;
     const callback = function (err, payload) {
       try {
         expect(payload.data.testSubscription).to.equals('good');
+        setTimeout(() => done(), 2);
       } catch (e) {
-        done(e);
+        setTimeout(() => done(e), 2);
         return;
+      } finally {
+        subManager.unsubscribe(subscriberId);
       }
-      done();
     };
 
     subManager.subscribe({ query, operationName: 'X', callback }).then(subId => {
+      subscriberId = subId;
       subManager.publish('testSubscription', 'good');
-      setTimeout(() => {
-        subManager.unsubscribe(subId);
-      }, 200);
     });
   });
 
@@ -137,14 +143,17 @@ describe('SubscriptionManager', function () {
     const query = `subscription Filter1($filterBoolean: Boolean){
      testFilter(filterBoolean: $filterBoolean)
    }`;
+    let subscriberId;
     const callback = function (err, payload) {
       try {
         expect(payload.data.testFilter).to.equals('goodFilter');
+        setTimeout(() => done(), 2);
       } catch (e) {
-        done(e);
+        setTimeout(() => done(e), 2);
         return;
+      } finally {
+        subManager.unsubscribe(subscriberId);
       }
-      done();
     };
     subManager.subscribe({
       query,
@@ -152,11 +161,9 @@ describe('SubscriptionManager', function () {
       variables: { filterBoolean: true },
       callback,
     }).then(subId => {
-      subManager.publish('Filter1', { filterBoolean: false });
-      subManager.publish('Filter1', { filterBoolean: true });
-      setTimeout(() => {
-        subManager.unsubscribe(subId);
-      }, 500);
+      subscriberId = subId;
+      subManager.publish(FILTER1, { filterBoolean: false });
+      subManager.publish(FILTER1, { filterBoolean: true });
     });
   });
 
@@ -166,16 +173,20 @@ describe('SubscriptionManager', function () {
     const query = `subscription multiTrigger($filterBoolean: Boolean, $uga: String){
       testFilterMulti(filterBoolean: $filterBoolean, a: $uga, b: 66)
     }`;
+    let subscriberId;
     const callback = function (err, payload) {
       try {
         expect(payload.data.testFilterMulti).to.equals('goodFilter');
         triggerCount++;
+              logger.debug('Checking the callback ', err, payload, triggerCount);
       } catch (e) {
-        done(e);
+        setTimeout(() => done(e), 2);
+        subManager.unsubscribe(subscriberId);
         return;
       }
       if (triggerCount === 2) {
-        done();
+       subManager.unsubscribe(subscriberId);
+        setTimeout(() => done(), 2);
       }
     };
     subManager.subscribe({
@@ -184,18 +195,17 @@ describe('SubscriptionManager', function () {
       variables: { filterBoolean: true, uga: 'UGA' },
       callback,
     }).then(subId => {
-      subManager.publish('NotATrigger', { filterBoolean: false });
-      subManager.publish('Trigger1', { filterBoolean: true });
-      subManager.publish('Trigger2', { filterBoolean: true });
-      setTimeout(() => {
-        subManager.unsubscribe(subId);
-      }, 500);
-    })
+      subscriberId = subId;
+      subManager.publish(NOT_A_TRIGGER, { filterBoolean: false });
+      subManager.publish(TRIGGER1, { filterBoolean: true });
+      subManager.publish(TRIGGER2, { filterBoolean: true });
+    });
   });
 
   it('can unsubscribe', function (done) {
     const query = 'subscription X{ testSubscription }';
     const callback = (err, payload) => {
+      logger.debug('callback would not be called but called with ', payload, err);
       try {
         assert(false);
       } catch (e) {
@@ -207,8 +217,8 @@ describe('SubscriptionManager', function () {
     subManager.subscribe({ query, operationName: 'X', callback }).then(subId => {
       subManager.unsubscribe(subId);
       subManager.publish('testSubscription', 'bad');
-      setTimeout(done, 1500);
-    })
+      setTimeout(done, 100);
+    });
   });
 
   it('throws an error when trying to unsubscribe from unknown id', function () {
@@ -216,23 +226,28 @@ describe('SubscriptionManager', function () {
       .to.throw('undefined');
   });
 
-  it('calls the error callback if there is an execution error', function () {
+  it('calls the error callback if there is an execution error', function (done) {
     const query = `subscription X($uga: Boolean!){
       testSubscription @skip(if: $uga)
     }`;
+    let subscriberId;
     const callback = function (err, payload) {
-      expect(payload).to.be.undefined;
-      expect(err.message).to.equals(
-        'Variable "$uga" of required type "Boolean!" was not provided.'
-      );
+      try {
+        expect(payload).to.be.undefined;
+        expect(err.message).to.equals(
+          'Variable "$uga" of required type "Boolean!" was not provided.',
+        );
+        setTimeout(() => done(), 2);
+      } catch (e) {
+        setTimeout(() => done(e), 2);
+      } finally {
+        subManager.unsubscribe(subscriberId);
+      }
     };
 
     subManager.subscribe({ query, operationName: 'X', callback }).then(subId => {
+      subscriberId = subId;
       subManager.publish('testSubscription', 'good');
-      setTimeout(() => {
-        subManager.unsubscribe(subId);
-        // done();
-      }, 200);
     });
   });
 
@@ -242,7 +257,7 @@ describe('SubscriptionManager', function () {
       logger,
       triggerTransform,
     });
-
+    let subscriberId;
     const subManager2 = new SubscriptionManager({
       schema,
       setupFunctions: {
@@ -258,9 +273,11 @@ describe('SubscriptionManager', function () {
     const callback = (err, payload) => {
       try {
         expect(payload.data.testChannelOptions).to.equals('test');
-        done();
+        setTimeout(() => done(), 2);
       } catch (e) {
-        done(e);
+        setTimeout(() => done(e), 2);
+      } finally {
+        pubsub.unsubscribe(subscriberId);
       }
     };
 
@@ -272,24 +289,29 @@ describe('SubscriptionManager', function () {
     const variables = { repoName: 'graphql-rabbitmq-subscriptions' };
 
     subManager2.subscribe({ query, operationName: 'X', variables, callback }).then(subId => {
+      subscriberId = subId;
       pubsub.publish('comments.graphql-rabbitmq-subscriptions', 'test');
-
-      setTimeout(() => pubsub.unsubscribe(subId), 200);
-    })
-  })
+    });
+  });
 
 });
 
 
-// describe("Delete Queues After tests", () => {
-//   it("Delete all test queues", () => {
-//     const config: IRabbitMqConnectionConfig = {host: "127.0.0.1", port: 5672};
-//     var f = new RabbitMqConnectionFactory(logger, config);
-//     var d = new DefaultQueueNameConfig('testSubscription');
-//     return f.create().then(c => {
-//       return c.createChannel().then(ch => {
-//         return Promise.all([ch.deleteExchange(d.dlx), ch.deleteQueue(d.dlq), ch.deleteQueue(d.name)]).return()
-//       })
-//     })
-//   });
-// });
+describe('Delete Queues After tests', () => {
+  it('Delete all test queues', () => {
+    const config: IRabbitMqConnectionConfig = {host: '127.0.0.1', port: 5672};
+    let f = new RabbitMqConnectionFactory(logger, config);
+    // let d = new DefaultQueueNameConfig('testSubscription');
+    return f.create().then(c => {
+      return c.createChannel().then(ch => {
+        return Promise.all([ch.deleteExchange(`${TEST_SUBSCRIPTION}.DLQ.Exchange`),
+        ch.deleteExchange(`comments.graphql-rabbitmq-subscriptions.DLQ.Exchange`),
+        ch.deleteExchange(`${TRIGGER1}.DLQ.Exchange`),
+        ch.deleteExchange(`${TRIGGER2}.DLQ.Exchange`),
+        ch.deleteExchange(`${NOT_A_TRIGGER}.DLQ.Exchange`),
+        ch.deleteExchange(`${FILTER1}.DLQ.Exchange`),
+        ]);
+      });
+    });
+  });
+});

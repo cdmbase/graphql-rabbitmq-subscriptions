@@ -1,17 +1,16 @@
-import {PubSubEngine} from 'graphql-subscriptions/dist/pubsub';
+import { PubSubEngine } from 'graphql-subscriptions/dist/pubsub';
 import {
   RabbitMqConnectionFactory,
   RabbitMqPublisher,
   RabbitMqSubscriber,
   IRabbitMqConnectionConfig,
-  IRabbitMqConsumerDisposer,
-} from "rabbitmq-pub-sub";
-import {each} from 'async';
+} from 'rabbitmq-pub-sub';
+import { each } from 'async';
 import * as Logger from 'bunyan';
 import { createChildLogger } from './childLogger';
 
 export interface PubSubRabbitMQBusOptions {
-  config?: IRabbitMqConnectionConfig,
+  config?: IRabbitMqConnectionConfig;
   connectionListener?: (err: Error) => void;
   triggerTransform?: TriggerTransform;
   logger?: Logger;
@@ -19,10 +18,19 @@ export interface PubSubRabbitMQBusOptions {
 
 export class AmqpPubSub implements PubSubEngine {
 
+  private consumer: any;
+  private producer: any;
+  private subscriptionMap: { [subId: number]: [string, Function] };
+  private subsRefsMap: { [trigger: string]: Array<number> };
+  private currentSubscriptionId: number;
+  private triggerTransform: TriggerTransform;
+  private unsubscribeChannel: any;
+  private logger: Logger;
+
   constructor(options: PubSubRabbitMQBusOptions = {}) {
 
-    this.triggerTransform = options.triggerTransform || ( trigger => trigger as string);
-    const config = options.config || {host: "127.0.0.1", port: 5672};
+    this.triggerTransform = options.triggerTransform || (trigger => trigger as string);
+    const config = options.config || { host: '127.0.0.1', port: 5672 };
     const { logger } = options;
 
     this.logger = createChildLogger(logger, 'AmqpPubSub');
@@ -63,9 +71,9 @@ export class AmqpPubSub implements PubSubEngine {
             return resolve(id);
           }).catch(err => {
             this.logger.error(err, "failed to recieve message from queue '%s'", triggerName);
-            reject(id)
-        })
-      })
+            reject(id);
+          });
+      });
     }
   }
 
@@ -88,22 +96,23 @@ export class AmqpPubSub implements PubSubEngine {
       });
     } else {
       const index = refs.indexOf(subId);
-      if (index != -1) {
+      if (index !== -1) {
         newRefs = [...refs.slice(0, index), ...refs.slice(index + 1)];
       }
       this.logger.trace("removing triggerName from listening '%s' ", triggerName);
     }
     this.subsRefsMap[triggerName] = newRefs;
     delete this.subscriptionMap[subId];
-    this.logger.trace("list of subscriptions still available '(%j)'", this.subscriptionMap)
+    this.logger.trace("list of subscriptions still available '(%j)'", this.subscriptionMap);
   }
 
   private onMessage(channel: string, message: string) {
     const subscribers = this.subsRefsMap[channel];
 
     // Don't work for nothing..
-    if (!subscribers || !subscribers.length)
+    if (!subscribers || !subscribers.length) {
       return;
+    }
 
     this.logger.trace("sending message to subscriber callback function '(%j)'", message);
 
@@ -112,19 +121,10 @@ export class AmqpPubSub implements PubSubEngine {
       const [triggerName, listener] = this.subscriptionMap[subId];
       listener(message);
       cb();
-    })
+    });
   }
-
-  private consumer: any;
-  private producer: any;
-  private subscriptionMap: {[subId: number]: [string, Function]};
-  private subsRefsMap: {[trigger: string]: Array<number>};
-  private currentSubscriptionId: number;
-  private triggerTransform: TriggerTransform;
-  private unsubscribeChannel: any;
-  private logger:Logger;
-
 }
+
 export type Path = Array<string | number>;
 export type Trigger = string | Path;
 export type TriggerTransform = (trigger: Trigger, channelOptions?: Object) => string;

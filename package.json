@@ -1,6 +1,6 @@
 {
   "name": "graphql-rabbitmq-subscriptions",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A graphql-subscriptions PubSub Engine using RabbitMQ",
   "main": "dist/index.js",
   "repository": {
@@ -34,7 +34,7 @@
     "@types/bunyan": "^0.0.35",
     "async": "^2.0.1",
     "graphql-subscriptions": "^0.2.3",
-    "rabbitmq-pub-sub": "^0.2.3"
+    "rabbitmq-pub-sub": "^0.2.5"
   },
   "devDependencies": {
     "@types/amqplib": "^0.5.1",
