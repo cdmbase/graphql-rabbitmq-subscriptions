@@ -216,27 +216,22 @@ describe('SubscriptionManager', function () {
       .to.throw('undefined');
   });
 
-  it('calls the error callback if there is an execution error', function (done) {
+  it('calls the error callback if there is an execution error', function () {
     const query = `subscription X($uga: Boolean!){
       testSubscription @skip(if: $uga)
     }`;
     const callback = function (err, payload) {
-      try {
-        expect(payload).to.be.undefined;
-        expect(err.message).to.equals(
-          'Variable "$uga" of required type "Boolean!" was not provided.'
-        );
-      } catch (e) {
-        done(e);
-        return;
-      }
-      done();
+      expect(payload).to.be.undefined;
+      expect(err.message).to.equals(
+        'Variable "$uga" of required type "Boolean!" was not provided.'
+      );
     };
 
     subManager.subscribe({ query, operationName: 'X', callback }).then(subId => {
       subManager.publish('testSubscription', 'good');
       setTimeout(() => {
         subManager.unsubscribe(subId);
+        // done();
       }, 200);
     });
   });

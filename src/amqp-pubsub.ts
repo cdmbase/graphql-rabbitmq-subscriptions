@@ -1,8 +1,8 @@
 import {PubSubEngine} from 'graphql-subscriptions/dist/pubsub';
 import {
   RabbitMqConnectionFactory,
-  RabbitMqConsumer,
-  RabbitMqProducer,
+  RabbitMqPublisher,
+  RabbitMqSubscriber,
   IRabbitMqConnectionConfig,
   IRabbitMqConsumerDisposer,
 } from "rabbitmq-pub-sub";
@@ -29,8 +29,8 @@ export class AmqpPubSub implements PubSubEngine {
 
     const factory = new RabbitMqConnectionFactory(logger, config);
 
-    this.consumer = new RabbitMqConsumer(logger, factory);
-    this.producer = new RabbitMqProducer(logger, factory);
+    this.consumer = new RabbitMqSubscriber(logger, factory);
+    this.producer = new RabbitMqPublisher(logger, factory);
 
     this.subscriptionMap = {};
     this.subsRefsMap = {};

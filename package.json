@@ -34,7 +34,7 @@
     "@types/bunyan": "^0.0.35",
     "async": "^2.0.1",
     "graphql-subscriptions": "^0.2.3",
-    "rabbitmq-pub-sub": "^0.2.2"
+    "rabbitmq-pub-sub": "^0.2.3"
   },
   "devDependencies": {
     "@types/amqplib": "^0.5.1",
