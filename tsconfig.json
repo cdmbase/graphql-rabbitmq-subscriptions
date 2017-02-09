@@ -3,8 +3,9 @@
     "target": "es5",
     "module": "commonjs",
     "experimentalDecorators": true,
-    "declaration": false,
+    "declaration": true,
     "removeComments": true,
+    "noImplicitAny": false,
     "noLib": false,
     "preserveConstEnums": false,
     "moduleResolution": "node",
@@ -13,7 +14,6 @@
     "outDir": "./dist",
     "allowSyntheticDefaultImports": true,
     "pretty": true
-    //"lib": ["es6"]
   },
   "exclude": [
     "node_modules",
