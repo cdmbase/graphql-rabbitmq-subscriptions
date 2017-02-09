@@ -13,7 +13,11 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "allowSyntheticDefaultImports": true,
-    "pretty": true
+    "pretty": true,
+            "lib": [
+            "es2015",
+            "es5"
+        ]
   },
   "exclude": [
     "node_modules",

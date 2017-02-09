@@ -1,6 +1,6 @@
 {
   "name": "graphql-rabbitmq-subscriptions",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A graphql-subscriptions PubSub Engine using RabbitMQ",
   "main": "dist/index.js",
   "repository": {
@@ -42,7 +42,6 @@
     "@types/bluebird": "^3.0.37",
     "@types/chai": "^3.4.34",
     "@types/chai-as-promised": "0.0.29",
-    "@types/core-js": "^0.9.35",
     "@types/graphql": "^0.8.2",
     "@types/mocha": "^2.2.39",
     "@types/node": "7.0.5",
