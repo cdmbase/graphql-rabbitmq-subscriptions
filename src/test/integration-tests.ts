@@ -1,6 +1,6 @@
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
-import { ConsoleLogger } from 'cdm-logger';
+import { ConsoleLogger } from '@cdm-logger/server';
 import {
   IRabbitMqConnectionConfig,
   RabbitMqConnectionFactory,

@@ -7,7 +7,7 @@ import {
 } from 'rabbitmq-pub-sub';
 import { each } from 'async';
 import * as Logger from 'bunyan';
-import { createChildLogger } from './childLogger';
+import { createChildLogger } from './child-logger';
 
 export interface PubSubRabbitMQBusOptions {
   config?: IRabbitMqConnectionConfig;

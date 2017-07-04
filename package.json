@@ -31,7 +31,7 @@
     "prepublish": "npm run integration"
   },
   "dependencies": {
-    "@types/bunyan": "^0.0.35",
+    "@types/bunyan": "^1.8.0",
     "async": "^2.0.1",
     "graphql-subscriptions": "^0.2.3",
     "rabbitmq-pub-sub": "^0.2.5"
@@ -57,7 +57,7 @@
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
     "bluebird": "^3.4.7",
-    "cdm-logger": "^0.3.2",
+    "@cdm-logger/server": "^3.0.1",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
     "graphql": "^0.8.0 || ^0.9.0",
