@@ -19,6 +19,22 @@ const subscriptionManager = new SubscriptionManager({
 });
 ```
 
+## Logging example
+The `logger` need to be implementation of `bunyan`. You can use following example logger.
+
+```javascript
+import {ConsoleLogger,IConsoleLoggerSettings} from "@cdm-logger/server";
+import * as Logger from "bunyan";
+
+const settings: IConsoleLoggerSettings = {
+  level: "info", // Optional: default 'info' ('trace'|'info'|'debug'|'warn'|'error'|'fatal')
+  mode: "short" // Optional: default 'short' ('short'|'long'|'dev'|'raw')
+}
+
+const logger: Logger = ConsoleLogger.create("<app name>", settings);
+```javascript
+
+More details about [@cdm-logger/server](https://github.com/cdmbase/cdm-logger)
 ## Using Trigger Transform
 
 Recently, graphql-subscriptions package added a way to pass in options to each call of subscribe.
