@@ -76,9 +76,9 @@ The basic usage is great for development and you will be able to connect to a ra
 But for any production usage you should probably pass in a rabbitmq options object
  
 ```javascript
-import { RedisPubSub } from 'graphql-rabbitmq-subscriptions';
+import { AmqpPubSub } from 'graphql-rabbitmq-subscriptions';
 
-const pubsub = new RedisPubSub({
+const pubsub = new AmqpPubSub({
   config: {
     host: RABBITMQ_DOMAIN_NAME,
     port: PORT_NUMBER,
