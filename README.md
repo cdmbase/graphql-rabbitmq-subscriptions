@@ -20,6 +20,7 @@ const subscriptionManager = new SubscriptionManager({
 ```
 
 ## Logging example
+
 The `logger` need to be implementation of `bunyan`. You can use following example logger.
 
 ```javascript
@@ -35,6 +36,7 @@ const logger: Logger = ConsoleLogger.create("<app name>", settings);
 ```javascript
 
 More details about [@cdm-logger/server](https://github.com/cdmbase/cdm-logger)
+
 
 ## Using Trigger Transform
 
