@@ -35,6 +35,26 @@ const settings: IConsoleLoggerSettings = {
 const logger: Logger = ConsoleLogger.create("<app name>", settings);
 ```
 
+Sample Logging trace file
+```
+[15:01:16.046Z] TRACE integration-test: trying to subscribe to queue 'testSubscription' (child=amqp-pubsub, class=AmqpPubSub)
+[15:01:16.050Z] DEBUG integration-test: connecting to amqp://127.0.0.1:5672 (child=rabbitmq-pub-sub, class=RabbitMqConnectionFactory)
+[15:01:16.109Z] TRACE integration-test: got channel for queue 'testSubscription' (child=rabbitmq-pub-sub, class=RabbitMqConsumer)
+[15:01:16.110Z] TRACE integration-test: setup '{"name":"testSubscription","dlq":"","dlx":"testSubscription.DLQ.Exchange"}' (child=rabbitmq-pub-sub, class=RabbitMqConsumer)
+[15:01:16.117Z] DEBUG integration-test: queue name generated for subscription queue '(testSubscription)' is '(amq.gen-0Nan220vcDjNVmnnXZOZxg)' (child=rabbitmq-pub-sub, class=RabbitMqConsumer)
+[15:01:16.117Z] TRACE integration-test: subscribing to queue 'testSubscription' (child=rabbitmq-pub-sub, class=RabbitMqConsumer)
+[15:01:16.119Z] TRACE integration-test: subscribed to queue 'testSubscription' (amq.ctag-nZJSNBvCUl2V_RGYF5ie5w) (child=rabbitmq-pub-sub, class=RabbitMqConsumer)
+[15:01:16.119Z] TRACE integration-test: publishing for queue 'testSubscription' ("good") (child=amqp-pubsub, class=AmqpPubSub)
+[15:01:16.120Z] DEBUG integration-test: connecting to amqp://127.0.0.1:5672 (child=rabbitmq-pub-sub, class=RabbitMqConnectionFactory)
+[15:01:16.126Z] TRACE integration-test: got channel for exchange 'testSubscription.DLQ.Exchange' (child=rabbitmq-pub-sub, class=RabbitMqPublisher)
+[15:01:16.127Z] TRACE integration-test: setup '{"name":"testSubscription","dlq":"","dlx":"testSubscription.DLQ.Exchange"}' (child=rabbitmq-pub-sub, class=RabbitMqPublisher)
+[15:01:16.130Z] TRACE integration-test: message sent to exchange 'testSubscription.DLQ.Exchange' ("good") (child=rabbitmq-pub-sub, class=RabbitMqPublisher)
+[15:01:16.132Z] TRACE integration-test: message arrived from queue 'testSubscription' ("good") (child=rabbitmq-pub-sub, class=RabbitMqConsumer)
+[15:01:16.133Z] TRACE integration-test: sending message to subscriber callback function '("good")' (child=amqp-pubsub, class=AmqpPubSub)
+[15:01:16.137Z] TRACE integration-test: disposing subscriber to queue 'testSubscription' (amq.ctag-nZJSNBvCUl2V_RGYF5ie5w) (child=rabbitmq-pub-sub, class=RabbitMqConsumer)
+[15:01:16.137Z] TRACE integration-test: list of subscriptions still available '({})' (child=amqp-pubsub, class=AmqpPubSub)
+[15:01:16.138Z] TRACE integration-test: message processed from queue 'testSubscription' ("good") (child=rabbitmq-pub-sub, class=RabbitMqConsumer)
+```
 More details about [@cdm-logger/server](https://github.com/cdmbase/cdm-logger)
 
 ## Using Trigger Transform
