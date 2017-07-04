@@ -35,6 +35,7 @@ const logger: Logger = ConsoleLogger.create("<app name>", settings);
 ```javascript
 
 More details about [@cdm-logger/server](https://github.com/cdmbase/cdm-logger)
+
 ## Using Trigger Transform
 
 Recently, graphql-subscriptions package added a way to pass in options to each call of subscribe.
