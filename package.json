@@ -32,13 +32,12 @@
   },
   "dependencies": {
     "@types/bunyan": "^1.8.0",
-    "async": "^2.0.1",
-    "graphql-subscriptions": "^0.2.3",
+    "async": "^2.5.0",
+    "graphql-subscriptions": "^0.4.2",
     "rabbitmq-pub-sub": "^0.2.5"
   },
   "devDependencies": {
     "@types/amqplib": "^0.5.1",
-    "@types/async": "^2.0.38",
     "@types/bluebird": "^3.0.37",
     "@types/chai": "^3.4.34",
     "@types/chai-as-promised": "0.0.29",

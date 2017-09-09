@@ -14,10 +14,10 @@
     "outDir": "./dist",
     "allowSyntheticDefaultImports": true,
     "pretty": true,
-            "lib": [
-            "es2015",
-            "es5"
-        ]
+    "lib": [
+      "es6",
+      "esnext"
+    ]
   },
   "exclude": [
     "node_modules",
