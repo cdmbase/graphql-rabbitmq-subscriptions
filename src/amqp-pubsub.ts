@@ -1,7 +1,7 @@
 import { PubSubEngine } from 'graphql-subscriptions/dist/pubsub-engine';
 import { PubSubAsyncIterator } from './pubsub-async-iterator';
 import {
-  RabbitMqConnectionFactory,
+  RabbitMqSingletonConnectionFactory,
   RabbitMqPublisher,
   RabbitMqSubscriber,
   IRabbitMqConnectionConfig,
@@ -36,7 +36,7 @@ export class AmqpPubSub implements PubSubEngine {
 
     this.logger = createChildLogger(logger, 'AmqpPubSub');
 
-    const factory = new RabbitMqConnectionFactory(logger, config);
+    const factory = new RabbitMqSingletonConnectionFactory(logger, config);
 
     this.consumer = new RabbitMqSubscriber(logger, factory);
     this.producer = new RabbitMqPublisher(logger, factory);
