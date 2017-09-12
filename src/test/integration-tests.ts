@@ -233,8 +233,7 @@ describe('SubscriptionManager', function () {
     let subscriberId;
     const callback = function (err, payload) {
       try {
-        expect(payload).to.be.undefined;
-        expect(err.message).to.equals(
+        expect(payload.errors[0].message).to.equals(
           'Variable "$uga" of required type "Boolean!" was not provided.',
         );
         setTimeout(() => done(), 2);

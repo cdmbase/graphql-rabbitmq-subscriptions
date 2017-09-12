@@ -1,6 +1,6 @@
 {
   "name": "graphql-rabbitmq-subscriptions",
-  "version": "1.0.10",
+  "version": "1.1.0",
   "description": "A graphql-subscriptions PubSub Engine using RabbitMQ",
   "main": "dist/index.js",
   "repository": {
@@ -30,10 +30,25 @@
     "custom": "npm run compile && mocha --compilers js:babel-core/register --reporter  spec --full-trace  ./dist/test/custom-tests.js ",
     "prepublish": "npm run integration"
   },
+  "jest": {
+    "testEnvironment": "node",
+    "roots": [
+      "src"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js"
+    ],
+    "transform": {
+      "\\.(ts|tsx)$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    },
+    "testRegex": "/__tests__/.*test*\\.(ts|tsx|js)$"
+  },
   "dependencies": {
     "@types/bunyan": "^1.8.0",
     "async": "^2.5.0",
-    "graphql-subscriptions": "^0.4.2",
+    "graphql-subscriptions": "^0.4.4",
     "rabbitmq-pub-sub": "^0.2.5"
   },
   "devDependencies": {
@@ -41,7 +56,6 @@
     "@types/bluebird": "^3.0.37",
     "@types/chai": "^3.4.34",
     "@types/chai-as-promised": "0.0.29",
-    "@types/graphql": "^0.8.2",
     "@types/mocha": "^2.2.39",
     "@types/node": "7.0.5",
     "@types/promises-a-plus": "^0.0.27",
@@ -56,16 +70,16 @@
     "babel-preset-es2015": "^6.3.13",
     "babel-preset-stage-0": "^6.3.13",
     "bluebird": "^3.4.7",
-    "@cdm-logger/server": "^3.0.1",
+    "@cdm-logger/server": "^3.0.2",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
-    "graphql": "^0.8.0 || ^0.9.0",
+    "graphql": "^0.10.5",   
     "istanbul": "1.0.0-alpha.2",
     "mocha": "^3.0.0",
     "remap-istanbul": "^0.8.4",
     "simple-mock": "^0.7.0",
     "tslint": "^4.4.2",
-    "typescript": "^2.1.5"
+    "typescript": "^2.3.4"
   },
   "typings": "dist/index.d.ts",
   "typescript": {
