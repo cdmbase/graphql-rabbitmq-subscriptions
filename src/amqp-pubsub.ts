@@ -1,6 +1,7 @@
-import { PubSubEngine } from 'graphql-subscriptions/dist/pubsub';
+import { PubSubEngine } from 'graphql-subscriptions/dist/pubsub-engine';
+import { PubSubAsyncIterator } from './pubsub-async-iterator';
 import {
-  RabbitMqConnectionFactory,
+  RabbitMqSingletonConnectionFactory,
   RabbitMqPublisher,
   RabbitMqSubscriber,
   IRabbitMqConnectionConfig,
@@ -35,7 +36,7 @@ export class AmqpPubSub implements PubSubEngine {
 
     this.logger = createChildLogger(logger, 'AmqpPubSub');
 
-    const factory = new RabbitMqConnectionFactory(logger, config);
+    const factory = new RabbitMqSingletonConnectionFactory(logger, config);
 
     this.consumer = new RabbitMqSubscriber(logger, factory);
     this.producer = new RabbitMqPublisher(logger, factory);
@@ -104,6 +105,10 @@ export class AmqpPubSub implements PubSubEngine {
     this.subsRefsMap[triggerName] = newRefs;
     delete this.subscriptionMap[subId];
     this.logger.trace("list of subscriptions still available '(%j)'", this.subscriptionMap);
+  }
+
+  public asyncIterator<T>(triggers: string | string[]): AsyncIterator<T> {
+    return new PubSubAsyncIterator<T>(this, triggers);
   }
 
   private onMessage(channel: string, message: string) {
