@@ -46,10 +46,9 @@ export class AmqpPubSub implements PubSubEngine {
     this.currentSubscriptionId = 0;
   }
 
-  public publish(trigger: string, payload: any): boolean {
+  public publish(trigger: string, payload: any): Promise<void> {
     this.logger.trace("publishing for queue '%s' (%j)", trigger, payload);
-    this.producer.publish(trigger, payload);
-    return true;
+    return this.producer.publish(trigger, payload);
   }
 
   public subscribe(trigger: string, onMessage: Function, options?: Object): Promise<number> {

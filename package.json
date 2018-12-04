@@ -48,7 +48,7 @@
   "dependencies": {
     "@types/bunyan": "^1.8.0",
     "async": "^2.5.0",
-    "graphql-subscriptions": "^0.4.4",
+    "graphql-subscriptions": "^1.0.0",
     "rabbitmq-pub-sub": "^0.2.5"
   },
   "devDependencies": {
