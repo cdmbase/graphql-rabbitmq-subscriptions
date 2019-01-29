@@ -25,7 +25,7 @@ export class AmqpPubSub implements PubSubEngine {
   private subsRefsMap: { [trigger: string]: Array<number> };
   private currentSubscriptionId: number;
   private triggerTransform: TriggerTransform;
-  private unsubscribeChannel: any;
+  private unsubscribeChannelMap: any;
   private logger: Logger;
 
   constructor(options: PubSubRabbitMQBusOptions = {}) {
@@ -44,6 +44,7 @@ export class AmqpPubSub implements PubSubEngine {
     this.subscriptionMap = {};
     this.subsRefsMap = {};
     this.currentSubscriptionId = 0;
+    this.unsubscribeChannelMap = {};
   }
 
   public publish(trigger: string, payload: any): Promise<void> {
@@ -67,7 +68,7 @@ export class AmqpPubSub implements PubSubEngine {
         this.consumer.subscribe(triggerName, (msg) => this.onMessage(triggerName, msg))
           .then(disposer => {
             this.subsRefsMap[triggerName] = [...(this.subsRefsMap[triggerName] || []), id];
-            this.unsubscribeChannel = disposer;
+            this.unsubscribeChannelMap[id] = disposer;
             return resolve(id);
           }).catch(err => {
             this.logger.error(err, "failed to recieve message from queue '%s'", triggerName);
@@ -89,7 +90,7 @@ export class AmqpPubSub implements PubSubEngine {
     let newRefs;
     if (refs.length === 1) {
       newRefs = [];
-      this.unsubscribeChannel().then(() => {
+      this.unsubscribeChannelMap[subId]().then(() => {
         this.logger.trace("cancelled channel from subscribing to queue '%s'", triggerName);
       }).catch(err => {
         this.logger.error(err, "channel cancellation failed from queue '%j'", triggerName);
@@ -132,4 +133,3 @@ export class AmqpPubSub implements PubSubEngine {
 export type Path = Array<string | number>;
 export type Trigger = string | Path;
 export type TriggerTransform = (trigger: Trigger, channelOptions?: Object) => string;
-
