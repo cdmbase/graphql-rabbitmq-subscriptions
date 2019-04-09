@@ -1,11 +1,11 @@
 # graphql-rabbitmq-subscriptions
 
-This package implements the PusSubEngine Interface from the graphql-subscriptions package. 
-It allows you to connect your subscriptions manger to a rabbitmq Pub Sub mechanism to support 
+This package implements the PusSubEngine Interface from the graphql-subscriptions package.
+It allows you to connect your subscriptions manger to a rabbitmq Pub Sub mechanism to support
 multiple subscription manager instances.
 
 This package is copied from [graphql-redis-subscriptions](https://github.com/davidyaha/graphql-redis-subscriptions) originally and modified to work with RabbitMQ.
-   
+
 ## Basic Usage
 
 ```javascript
@@ -24,18 +24,19 @@ const subscriptionManager = new SubscriptionManager({
 The `logger` need to be implementation of `bunyan`. You can use following example logger.
 
 ```javascript
-import {ConsoleLogger,IConsoleLoggerSettings} from "@cdm-logger/server";
-import * as Logger from "bunyan";
+import { ConsoleLogger, IConsoleLoggerSettings } from '@cdm-logger/server'
+import * as Logger from 'bunyan'
 
 const settings: IConsoleLoggerSettings = {
-  level: "info", // Optional: default 'info' ('trace'|'info'|'debug'|'warn'|'error'|'fatal')
-  mode: "short" // Optional: default 'short' ('short'|'long'|'dev'|'raw')
+    level: 'info', // Optional: default 'info' ('trace'|'info'|'debug'|'warn'|'error'|'fatal')
+    mode: 'short' // Optional: default 'short' ('short'|'long'|'dev'|'raw')
 }
 
-const logger: Logger = ConsoleLogger.create("<app name>", settings);
+const logger: Logger = ConsoleLogger.create('<app name>', settings)
 ```
 
 Sample Logging trace file
+
 ```
 [15:01:16.046Z] TRACE integration-test: trying to subscribe to queue 'testSubscription' (child=amqp-pubsub, class=AmqpPubSub)
 [15:01:16.050Z] DEBUG integration-test: connecting to amqp://127.0.0.1:5672 (child=rabbitmq-pub-sub, class=RabbitMqConnectionFactory)
@@ -55,6 +56,7 @@ Sample Logging trace file
 [15:01:16.137Z] TRACE integration-test: list of subscriptions still available '({})' (child=amqp-pubsub, class=AmqpPubSub)
 [15:01:16.138Z] TRACE integration-test: message processed from queue 'testSubscription' ("good") (child=rabbitmq-pub-sub, class=RabbitMqConsumer)
 ```
+
 More details about [@cdm-logger/server](https://github.com/cdmbase/cdm-logger)
 
 ## Using Trigger Transform
@@ -66,42 +68,52 @@ For example, meteor's live query could use mongo selector with arguments passed 
 
 This is only the standard but I would like to present an example of creating a specific subscription using the channel options feature.
 
-First I create a simple and generic trigger transform 
+First I create a simple and generic trigger transform
+
 ```javascript
-const triggerTransform = (trigger, {path}) => [trigger, ...path].join('.');
+const triggerTransform = (trigger, { path }) => [trigger, ...path].join('.')
 ```
 
 Then I pass it to the `AmqpPubSub` constructor.
+
 ```javascript
 const pubsub = new AmqpPubSub({
-  triggerTransform,
-});
+    triggerTransform
+})
 ```
+
 Lastly, I provide a setupFunction for `commentsAdded` subscription field.
 It specifies one trigger called `comments.added` and it is called with the channelOptions object that holds `repoName` path fragment.
+
 ```javascript
 const subscriptionManager = new SubscriptionManager({
-  schema,
-  setupFunctions: {
-    commentsAdded: (options, {repoName}) => ({
-      'comments.added': {
-        channelOptions: {path: [repoName]},
-      },
-    }),
-  },
-  pubsub,
-});
+    schema,
+    setupFunctions: {
+        commentsAdded: (options, { repoName }) => ({
+            'comments.added': {
+                channelOptions: { path: [repoName] }
+            }
+        })
+    },
+    pubsub
+})
 ```
 
 When I call `subscribe` like this:
+
 ```javascript
 const query = `
   subscription X($repoName: String!) {
     comments.added(repoName: $repoName)
   }
-`;
-const variables = {repoName: 'graphql-rabbitmq-subscriptions'};
-subscriptionManager.subscribe({query, operationName: 'X', variables, callback});
+`
+const variables = { repoName: 'graphql-rabbitmq-subscriptions' }
+subscriptionManager.subscribe({
+    query,
+    operationName: 'X',
+    variables,
+    callback
+})
 ```
 
 The subscription string that RabbitMQ will receive will be `comments.added.graphql-rabbitmq-subscriptions`.
@@ -112,15 +124,26 @@ This is one step towards lifting the load off of the graphql api server regardin
 
 The basic usage is great for development and you will be able to connect to a rabbitmq server running on your system seamlessly.
 But for any production usage you should probably pass in a rabbitmq options object
- 
+
 ```javascript
-import { AmqpPubSub } from 'graphql-rabbitmq-subscriptions';
+import { AmqpPubSub } from 'graphql-rabbitmq-subscriptions'
 
 const pubsub = new AmqpPubSub({
-  config: {
-    host: RABBITMQ_DOMAIN_NAME,
-    port: PORT_NUMBER,
-  },
-  logger,
-});
+    config: {
+        host: RABBITMQ_DOMAIN_NAME,
+        port: PORT_NUMBER
+    },
+    logger
+})
+```
+
+or you can use rabbitmq connection string instead of config object like this
+
+```javascript
+import { AmqpPubSub } from 'graphql-rabbitmq-subscriptions'
+
+const pubsub = new AmqpPubSub({
+    config: 'amqp://username:password@hostname.example.com/username',
+    logger
+})
 ```
