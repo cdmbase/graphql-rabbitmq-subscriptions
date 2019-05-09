@@ -1,6 +1,6 @@
 import { $$asyncIterator } from 'iterall';
 import { PubSubEngine } from 'graphql-subscriptions/dist/pubsub-engine';
-
+import * as Logger from 'bunyan';
 /**
  * A class for digesting PubSubEngine events via the new AsyncIterator interface.
  * This implementation is a generic version of the one located at
@@ -38,8 +38,10 @@ export class PubSubAsyncIterator<T> implements AsyncIterator<T> {
   private allSubscribed: Promise<number[]>;
   private listening: boolean;
   private pubsub: PubSubEngine;
+  private logger: Logger;
 
-  constructor(pubsub: PubSubEngine, eventNames: string | string[]) {
+  constructor(pubsub: PubSubEngine, eventNames: string | string[], logger?: Logger) {
+    this.logger = logger.child({ className: 'pubsub-async-iterator' });
     this.pubsub = pubsub;
     this.pullQueue = [];
     this.pushQueue = [];
@@ -49,45 +51,57 @@ export class PubSubAsyncIterator<T> implements AsyncIterator<T> {
   }
 
   public async next() {
+    this.logger.trace('next has been called, current state [ pullQueue: (%j) pushQueue: (%j)]', this.pullQueue, this.pushQueue);
     await this.allSubscribed;
     return this.listening ? this.pullValue() : this.return();
   }
 
   public async return() {
+    this.logger.trace('calling [return]');
     this.emptyQueue(await this.allSubscribed);
     return { value: undefined, done: true };
   }
 
   public async throw(error) {
+    this.logger.trace('throwing error');
     this.emptyQueue(await this.allSubscribed);
     return Promise.reject(error);
   }
 
   public [$$asyncIterator]() {
+    this.logger.trace('[$$asyncIterator]');
     return this;
   }
 
   private async pushValue(event) {
+    this.logger.trace('[pushValue] with event (%j)', event);
     await this.allSubscribed;
     if (this.pullQueue.length !== 0) {
+      this.logger.trace('pull event (%j) from pullQueue (%j)', event, this.pullQueue);
       this.pullQueue.shift()({ value: event, done: false });
     } else {
       this.pushQueue.push(event);
+      this.logger.trace('push event (%j) to pushQueue (%j)', event, this.pullQueue);      
     }
   }
 
   private pullValue(): Promise<IteratorResult<any>> {
-    return new Promise(resolve => {
+    this.logger.trace('[pullValue] ');
+    return new Promise((resolve => {
       if (this.pushQueue.length !== 0) {
+        this.logger.trace('pluck last event from pushQueue (%j)', this.pushQueue);
         resolve({ value: this.pushQueue.shift(), done: false });
       } else {
         this.pullQueue.push(resolve);
+        this.logger.trace('push Promise.resolve into pullQueue (%j)', this.pullQueue);
       }
-    });
+    }));
   }
 
   private emptyQueue(subscriptionIds: number[]) {
+    this.logger.trace('[emptyQueue] ');
     if (this.listening) {
+      this.logger.trace('listening is true, it will unsubscribeAll, will empty all elements in pullQueue (%j)', this.pullQueue);
       this.listening = false;
       this.unsubscribeAll(subscriptionIds);
       this.pullQueue.forEach(resolve => resolve({ value: undefined, done: true }));
@@ -97,15 +111,19 @@ export class PubSubAsyncIterator<T> implements AsyncIterator<T> {
   }
 
   private subscribeAll() {
+    this.logger.trace('[subscribeAll] ');
     return Promise.all(this.eventsArray.map(
-      eventName => this.pubsub.subscribe(eventName, this.pushValue.bind(this), {}),
+      eventName => {
+        this.logger.trace('subscribing to eventName (%j) with onMessage as this.pushValue', eventName);
+        return this.pubsub.subscribe(eventName, this.pushValue.bind(this), {});
+      },
     ));
   }
 
   private unsubscribeAll(subscriptionIds: number[]) {
+    this.logger.trace('unsubscribeAll to all subIds (%j)', subscriptionIds);
     for (const subscriptionId of subscriptionIds) {
       this.pubsub.unsubscribe(subscriptionId);
     }
   }
-
 }

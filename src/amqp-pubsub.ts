@@ -108,7 +108,7 @@ export class AmqpPubSub implements PubSubEngine {
   }
 
   public asyncIterator<T>(triggers: string | string[]): AsyncIterator<T> {
-    return new PubSubAsyncIterator<T>(this, triggers);
+    return new PubSubAsyncIterator<T>(this, triggers, this.logger);
   }
 
   private onMessage(channel: string, message: string) {
