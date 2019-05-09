@@ -61,11 +61,16 @@ var AmqpPubSub = (function () {
         var newRefs;
         if (refs.length === 1) {
             newRefs = [];
-            this.unsubscribeChannelMap[subId]().then(function () {
-                _this.logger.trace("cancelled channel from subscribing to queue '%s'", triggerName);
-            }).catch(function (err) {
-                _this.logger.error(err, "channel cancellation failed from queue '%j'", triggerName);
-            });
+            if (typeof this.unsubscribeChannelMap[subId] === "function") {
+                this.logger.trace("can't find '%s' in unsubscribeChannelMap for queue '%s'", subId, triggerName);
+            }
+            else {
+                this.unsubscribeChannelMap[subId]().then(function () {
+                    _this.logger.trace("cancelled channel from subscribing to queue '%s'", triggerName);
+                }).catch(function (err) {
+                    _this.logger.error(err, "channel cancellation failed from queue '%j'", triggerName);
+                });
+            }
         }
         else {
             var index = refs.indexOf(subId);
